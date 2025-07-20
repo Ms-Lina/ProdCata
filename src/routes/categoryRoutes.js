@@ -6,14 +6,14 @@ const {
   updateCategory, 
   deleteCategory 
 } = require("../controllers/categoryController");
-const { verifyToken } = require("../middleware/authMiddleware");
+
 
 const router = express.Router();
 
 router.get("/", getAllCategories);
 router.get("/:id", getCategoryById);
-router.post("/", verifyToken, createCategory);
-router.put("/:id", verifyToken, updateCategory);
-router.delete("/:id", verifyToken, deleteCategory);
+router.post("/", createCategory);
+router.put("/:id", updateCategory);
+router.delete("/:id", deleteCategory);
 
 module.exports = router;

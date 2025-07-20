@@ -1,7 +1,7 @@
 const Category = require("../models/Category");
 const Product = require("../models/Product");
 
-// Create a new category (Admin only)
+
 exports.createCategory = async (req, res) => {
   try {
     if (req.user.role !== "admin") {
@@ -21,7 +21,7 @@ exports.createCategory = async (req, res) => {
   }
 };
 
-// Get all categories (Public)
+
 exports.getAllCategories = async (req, res) => {
   try {
     const categories = await Category.find();
