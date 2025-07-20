@@ -30,7 +30,7 @@ The **Product Catalog API** is a RESTful API built with **Node.js, Express, and 
 ### **1️⃣ Clone the Repository**  
 ```bash
 git clone https://github.com/Ms-Lina/ProdCata.git
-cd product-catalog-api
+cd ProdCata
 ```
 
 ### **2️⃣ Install Dependencies**  
