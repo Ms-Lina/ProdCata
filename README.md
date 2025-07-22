@@ -102,15 +102,6 @@ npm run dev
 
 ---
 
-## **🔐 Authentication & Authorization**  
-The API uses **JWT-based authentication** to secure endpoints:  
-- **User Registration & Login**: Users must register and log in to get a token.  
-- **Token-Based Access**: The JWT token must be sent in the request header (`Authorization: Bearer <token>`) for protected routes.  
-- **Role-Based Access**: Certain actions (like adding products) are restricted to authenticated users.  
-
- 
-
----
 
 ## **📡 API Endpoints**  
 
