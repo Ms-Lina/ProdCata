@@ -1,10 +1,13 @@
 const express = require('express');
-const { createProduct, getProducts, updateProduct, deleteProduct } = require('../controllers/productController');
+const { createProduct, getProducts, updateProduct, deleteProduct, getLowStockProducts } = require('../controllers/productController');
+const { productValidationRules } = require('../middlewares/validators');
+const { validationErrorHandler } = require('../middlewares/errorHandler');
 const router = express.Router();
 
-router.post('/', createProduct);
+router.post('/', productValidationRules, validationErrorHandler, createProduct);
 router.get('/', getProducts);
-router.put('/:id', updateProduct);
+router.get('/low-stock', getLowStockProducts);
+router.put('/:id', productValidationRules, validationErrorHandler, updateProduct);
 router.delete('/:id', deleteProduct);
 
 module.exports = router;

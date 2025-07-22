@@ -8,11 +8,15 @@ The **Product Catalog API** is a RESTful API built with **Node.js, Express, and 
 ## **📜 Features**  
 ✅ **Product Management** – CRUD operations for products  
 ✅ **Category Management** – Organize products into categories  
-✅ **Authentication & Authorization** – Secure access using JWT  
-✅ **Role-Based Access Control** – Restricts actions to authorized users  
+✅ **Product Search & Filtering** – Search by name, category, and date created  
+✅ **Product Variants** – Support for size, color, and inventory tracking  
+✅ **Pricing & Discounts** – Price and discount fields with automatic discounted price calculation  
+✅ **Low-Stock Reporting** – Endpoint to query products with low inventory  
+✅ **Input Validation & Sanitization** – All create/update endpoints use express-validator  
+✅ **Comprehensive Error Handling** – Centralized error handler and validation error responses  
 ✅ **RESTful API Design** – Follows best API design practices  
 ✅ **MongoDB Integration** – Uses Mongoose for data handling  
-✅ **Middleware Support** – Error handling with custom middleware  
+✅ **Swagger Documentation** – API docs available at `/api-docs`  
 
 ---
 
@@ -66,22 +70,35 @@ npm run dev
 │   ├── routes            # API routes
 │   │   ├── productRoutes.js
 │   │   ├── categoryRoutes.js
-│   │   ├── authRoutes.js
 │   ├── controllers       # Business logic for API endpoints
 │   │   ├── productController.js
 │   │   ├── categoryController.js
-│   │   ├── authController.js
 │   ├── middlewares       # Middleware functions
-│   │   ├── authMiddleware.js
 │   │   ├── errorHandler.js
 │   ├── config            # Database connection setup
 │   │   ├── db.js
-│   ├── app.js            # Express app setup
+│   ├── app.js            # Swagger UI Express app (for API docs)
 │── .env                  # Environment variables
-│── server.js             # Main entry point
+│── server.js             # Main entry point (starts server, loads routes, connects DB)
 │── package.json          # Dependencies & scripts
 │── README.md             # Project documentation
 ```
+
+---
+
+## **🔗 How server.js and app.js Work Together**
+- **server.js** is the main entry point of the application. It:
+  - Loads environment variables
+  - Connects to MongoDB
+  - Sets up Express, middleware, and API routes
+  - Mounts the Swagger UI (from app.js) at `/api-docs`
+  - Starts the HTTP server
+- **app.js** (in `src/`) is a minimal Express app that only serves the Swagger UI documentation. It is imported and mounted by `server.js` at the `/api-docs` endpoint.
+
+**Typical startup flow:**
+1. You run `npm start` or `npm run dev` (which runs `server.js`).
+
+2. Visit `http://localhost:5000/api-docs` to view the API documentation.
 
 ---
 
@@ -91,91 +108,91 @@ The API uses **JWT-based authentication** to secure endpoints:
 - **Token-Based Access**: The JWT token must be sent in the request header (`Authorization: Bearer <token>`) for protected routes.  
 - **Role-Based Access**: Certain actions (like adding products) are restricted to authenticated users.  
 
-### **🔑 Authentication Endpoints**
-| Method | Endpoint           | Description                     | Access     |
-|--------|-------------------|---------------------------------|------------|
-| POST   | `/api/auth/register` | Register a new user            | Public     |
-| POST   | `/api/auth/login`    | User login (returns JWT token) | Public     |
-
-### **🔹 Protected Routes**
-- **Only authenticated users** can create, update, or delete **products** and **categories**.  
-- **Public routes** (GET requests) are accessible without authentication.  
+ 
 
 ---
 
 ## **📡 API Endpoints**  
 
-### **🔹 Category Endpoints**  
-| Method | Endpoint                | Description                 | Access    |
-|--------|-------------------------|-----------------------------|-----------|
-| POST   | `/api/categories`       | Create a new category       | Protected |
-| GET    | `/api/categories`       | Get all categories          | Public    |
-| GET    | `/api/categories/:id`   | Get a single category       | Public    |
-| PUT    | `/api/categories/:id`   | Update a category           | Protected |
-| DELETE | `/api/categories/:id`   | Delete a category           | Protected |
+### 🟦 Product Endpoints
+| Method | Endpoint                | Description                 | Access    | Status Codes | Example |
+|--------|-------------------------|-----------------------------|-----------|--------------|---------|
+| POST   | `/api/products`         | Create a new product        | Protected | 201, 400     | `{ "name": "Shoe", "price": 100, "discount": 10, "category": "...", "variants": [{"size":"M","color":"Red","stock":5}], "inventory": 10 }` |
+| GET    | `/api/products`         | Get all products (with filtering) | Public    | 200          | `/api/products?name=shoe&category=123&createdAfter=2024-01-01` |
+| GET    | `/api/products/:id`     | Get a single product        | Public    | 200, 404     |         |
+| PUT    | `/api/products/:id`     | Update a product            | Protected | 200, 400, 404|         |
+| DELETE | `/api/products/:id`     | Delete a product            | Protected | 200, 404     |         |
+| GET    | `/api/products/low-stock` | Get low-stock products     | Public    | 200          | `/api/products/low-stock?threshold=3` |
 
-### **🔹 Product Endpoints**  
-| Method | Endpoint                | Description                 | Access    |
-|--------|-------------------------|-----------------------------|-----------|
-| POST   | `/api/products`         | Create a new product        | Protected |
-| GET    | `/api/products`         | Get all products            | Public    |
-| GET    | `/api/products/:id`     | Get a single product        | Public    |
-| PUT    | `/api/products/:id`     | Update a product            | Protected |
-| DELETE | `/api/products/:id`     | Delete a product            | Protected |
-
----
-
-## **📊 Example API Requests**  
-
-### **1️⃣ Register a User (POST)**
-**URL:** `http://localhost:5000/api/auth/register`  
-**Body (JSON):**  
-```json
-{
-  "username": "admin",
-  "email": "admin@example.com",
-  "password": "securepassword"
-}
-```
-✅ Response: `201 Created`  
-
-### **2️⃣ Login to Get a Token (POST)**
-**URL:** `http://localhost:5000/api/auth/login`  
-**Body (JSON):**  
-```json
-{
-  "email": "admin@example.com",
-  "password": "securepassword"
-}
-```
-✅ Response:  
-```json
-{
-  "token": "your-generated-jwt-token"
-}
-```
-
-### **3️⃣ Use the Token in Protected Requests**
-```bash
-curl -X POST http://localhost:5000/api/products \
--H "Authorization: Bearer YOUR_TOKEN_HERE" \
--H "Content-Type: application/json" \
--d '{"name": "Laptop", "price": 1500, "category": "CATEGORY_ID"}'
-```
+### 🟩 Category Endpoints
+| Method | Endpoint                | Description                 | Access    | Status Codes | Example |
+|--------|-------------------------|-----------------------------|-----------|--------------|---------|
+| POST   | `/api/categories`       | Create a new category       | Protected | 201, 400     | `{ "name": "Shoes", "description": "Footwear" }` |
+| GET    | `/api/categories`       | Get all categories          | Public    | 200          |         |
+| GET    | `/api/categories/:id`   | Get a single category       | Public    | 200, 404     |         |
+| PUT    | `/api/categories/:id`   | Update a category           | Protected | 200, 400, 404|         |
+| DELETE | `/api/categories/:id`   | Delete a category           | Protected | 200, 404     |         |
 
 ---
 
-## **🛠️ Challenges & Solutions**  
+## **📝 Request/Response Examples**
 
-### **🔸 Issue: MongoDB Connection Error**
-**Solution:**  
-- Ensure MongoDB is installed and running  
-- Verify `MONGO_URI` in `.env` file  
+### Create Product (POST /api/products)
+**Request Body:**
+```json
+{
+  "name": "Shoe",
+  "price": 100,
+  "discount": 10,
+  "category": "<categoryId>",
+  "variants": [{"size":"M","color":"Red","stock":5}],
+  "inventory": 10
+}
+```
+**Response:**
+```json
+{
+  "_id": "...",
+  "name": "Shoe",
+  "price": 100,
+  "discount": 10,
+  "discountedPrice": 90,
+  ...
+}
+```
 
-### **🔸 Issue: Token Not Working**
-**Solution:**  
-- Make sure you're **including the token** in the `Authorization` header  
-- Check if the secret key in `.env` matches the one used in `jwt.sign()`  
+### Get Products with Filtering (GET /api/products?name=shoe&category=123)
+**Response:**
+```json
+[
+  {
+    "_id": "...",
+    "name": "Shoe",
+    "price": 100,
+    "discount": 10,
+    "discountedPrice": 90,
+    ...
+  }
+]
+```
+
+### Validation Error Example
+**Response:**
+```json
+{
+  "errors": [
+    { "msg": "Product name is required", "param": "name", ... }
+  ]
+}
+```
+
+---
+
+## **⚠️ Assumptions & Limitations**
+- Discounts are percentage-based (e.g., 10 = 10% off).
+- Inventory is tracked at the product level and per variant.
+- Only basic reporting (low-stock) is implemented.
+- Authentication is assumed for protected endpoints (not shown in this sample).
 
 ---
 

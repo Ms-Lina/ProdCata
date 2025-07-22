@@ -4,10 +4,6 @@ const Product = require("../models/Product");
 
 exports.createCategory = async (req, res) => {
   try {
-    if (req.user.role !== "admin") {
-      return res.status(403).json({ success: false, message: "Access denied. Admins only." });
-    }
-
     const { name, description } = req.body;
     const category = new Category({ name, description });
 
@@ -47,10 +43,6 @@ exports.getCategoryById = async (req, res) => {
 // Update a category (Admin only)
 exports.updateCategory = async (req, res) => {
   try {
-    if (req.user.role !== "admin") {
-      return res.status(403).json({ success: false, message: "Access denied. Admins only." });
-    }
-
     const { name, description } = req.body;
     const category = await Category.findByIdAndUpdate(
       req.params.id,
@@ -74,10 +66,6 @@ exports.updateCategory = async (req, res) => {
 // Delete a category (Admin only)
 exports.deleteCategory = async (req, res) => {
   try {
-    if (req.user.role !== "admin") {
-      return res.status(403).json({ success: false, message: "Access denied. Admins only." });
-    }
-
     const products = await Product.find({ category: req.params.id });
 
     if (products.length > 0) {

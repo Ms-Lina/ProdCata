@@ -5,6 +5,16 @@
     "version": "1.0.0",
     "description": "API documentation for the Product Catalog"
   },
+  "tags": [
+    {
+      "name": "Products",
+      "description": "Product Endpoints"
+    },
+    {
+      "name": "Categories",
+      "description": "Category Endpoints"
+    }
+  ],
   "servers": [
     {
       "url": "http://localhost:5000/api"
@@ -13,6 +23,7 @@
   "paths": {
     "/products": {
       "get": {
+        "tags": ["Products"],
         "summary": "Get all products",
         "responses": {
           "200": {
@@ -21,7 +32,47 @@
         }
       },
       "post": {
+        "tags": ["Products"],
         "summary": "Create a new product",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": { "type": "string" },
+                  "description": { "type": "string" },
+                  "price": { "type": "number" },
+                  "discount": { "type": "number" },
+                  "category": { "type": "string" },
+                  "variants": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "size": { "type": "string" },
+                        "color": { "type": "string" },
+                        "stock": { "type": "number" }
+                      }
+                    }
+                  },
+                  "inventory": { "type": "number" }
+                },
+                "required": ["name", "price", "category"]
+              },
+              "example": {
+                "name": "Shoe",
+                "description": "A comfortable shoe",
+                "price": 100,
+                "discount": 10,
+                "category": "<categoryId>",
+                "variants": [{"size":"M","color":"Red","stock":5}],
+                "inventory": 10
+              }
+            }
+          }
+        },
         "responses": {
           "201": {
             "description": "Product created"
@@ -31,6 +82,7 @@
     },
     "/products/{id}": {
       "put": {
+        "tags": ["Products"],
         "summary": "Update a product",
         "parameters": [
           {
@@ -40,6 +92,44 @@
             "schema": { "type": "string" }
           }
         ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": { "type": "string" },
+                  "description": { "type": "string" },
+                  "price": { "type": "number" },
+                  "discount": { "type": "number" },
+                  "category": { "type": "string" },
+                  "variants": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "size": { "type": "string" },
+                        "color": { "type": "string" },
+                        "stock": { "type": "number" }
+                      }
+                    }
+                  },
+                  "inventory": { "type": "number" }
+                }
+              },
+              "example": {
+                "name": "Shoe",
+                "description": "A comfortable shoe",
+                "price": 120,
+                "discount": 5,
+                "category": "<categoryId>",
+                "variants": [{"size":"L","color":"Blue","stock":3}],
+                "inventory": 8
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "description": "Product updated"
@@ -47,6 +137,7 @@
         }
       },
       "delete": {
+        "tags": ["Products"],
         "summary": "Delete a product",
         "parameters": [
           {
@@ -65,6 +156,7 @@
     },
     "/categories": {
       "get": {
+        "tags": ["Categories"],
         "summary": "Get all categories",
         "responses": {
           "200": {
@@ -73,7 +165,27 @@
         }
       },
       "post": {
+        "tags": ["Categories"],
         "summary": "Create a new category",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": { "type": "string" },
+                  "description": { "type": "string" }
+                },
+                "required": ["name"]
+              },
+              "example": {
+                "name": "Romance",
+                "description": "Romantic books"
+              }
+            }
+          }
+        },
         "responses": {
           "201": {
             "description": "Category created"
@@ -83,6 +195,7 @@
     },
     "/categories/{id}": {
       "get": {
+        "tags": ["Categories"],
         "summary": "Get a category by ID",
         "parameters": [
           {
@@ -99,6 +212,7 @@
         }
       },
       "put": {
+        "tags": ["Categories"],
         "summary": "Update a category",
         "parameters": [
           {
@@ -108,6 +222,24 @@
             "schema": { "type": "string" }
           }
         ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": { "type": "string" },
+                  "description": { "type": "string" }
+                }
+              },
+              "example": {
+                "name": "Science Fiction",
+                "description": "Sci-fi books"
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "description": "Category updated"
@@ -115,6 +247,7 @@
         }
       },
       "delete": {
+        "tags": ["Categories"],
         "summary": "Delete a category",
         "parameters": [
           {
